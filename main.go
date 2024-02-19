@@ -81,7 +81,7 @@ func init() {
 	COGNITO_JWKS_URL = fmt.Sprintf("https://cognito-idp.ap-northeast-1.amazonaws.com/%s/.well-known/jwks.json", ensureEnvValue("POOL_ID"))
 }
 
-func verifyToken(signedToken string) (jwt.Token, error) {
+func verifyToken(signedToken string) jwt.Token {
 	keySet, err := jwk.Fetch(context.Background(), COGNITO_JWKS_URL)
 	if err != nil {
 		log.Fatal(err)
@@ -93,7 +93,7 @@ func verifyToken(signedToken string) (jwt.Token, error) {
 		log.Fatal(err)
 	}
 
-	return verifiedToken, nil
+	return verifiedToken
 }
 
 func revokeToken(cfg aws.Config, token *types.AuthenticationResultType) {
@@ -126,10 +126,7 @@ func main() {
 	result := getToken(cfg)
 
 	// verify token using public keys
-	token, err := verifyToken(*result.IdToken)
-	if err != nil {
-		log.Fatal(err)
-	}
+	token := verifyToken(*result.IdToken)
 
 	// check expiration of token
 	now := time.Now().UTC()
