@@ -131,7 +131,8 @@ func main() {
 	// check expiration of token
 	now := time.Now().UTC()
 	exp := token.Expiration()
-	if exp.After(now) {
+
+	if now.After(exp) {
 		log.Fatal("id token is expiration")
 	}
 
